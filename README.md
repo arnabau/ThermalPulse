@@ -2,6 +2,8 @@
 
 ThermalPulse is a fully-functional, modern, lightweight, SwiftUI macOS application for hardware monitoring and fan control. Built with **SwiftUI**, it offers a premium glassmorphic interface to monitor your computer.
 
+Download latest version: 1.0.16 https://github.com/arnabau/thermalpulse/releases/latest
+
 ## 🚀 Key Features
 
 - **Safe-by-design**
@@ -53,6 +55,10 @@ ThermalPulse follows the **MVVM (Model-View-ViewModel)** architectural pattern, 
 - Proper XPC communication for privileged operations
 - Cleanup on app termination
 
+## Requirements
+- macOS 26 or later
+- Apple Silicon (M1, M2, M3, M4, M5). No Intel support
+
 ## 📸 Interface
 
 | Dashboard | Mac Mini | Macbook Air |
@@ -67,7 +73,7 @@ The UI leverages **Glassmorphism** and **Material effects** to blend perfectly w
 - Localization: Internationalization support
 
 ## 🛠 Installation
-
-1. Clone the repository:
+1. Download the binary (dmg), drag it to Applications folder, launch the app and click "Install Helper" if you want to take control of the fans
+2. Clone the repository:
    ```bash
    git clone [https://github.com/arnabau/ThermalPulse.git](https://github.com/arnabau/ThermalPulse.git)
