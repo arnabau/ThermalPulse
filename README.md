@@ -31,12 +31,6 @@ ThermalPulse follows the **MVVM (Model-View-ViewModel)** architectural pattern, 
 - **Service layer** (HelperInstaller, XPCClient) for privileged operations
 - **UI layer** (DashboardView, MenuBarController) for presentation
 
-<p align="center">
-  <img src="Media/tp01.png" width="600" height="1300" title="">
-  <img src="Media/tp02.png" width="600" height="1300" title="">
-  <img src="Media/tp03.png" width="600" height="1300" title="">
-</p>
-
 ### Technical Highlights:
 - Secure communication with privileged helper tool
 - Manual fan mode control
@@ -61,7 +55,7 @@ ThermalPulse follows the **MVVM (Model-View-ViewModel)** architectural pattern, 
 
 ## 📸 Interface
 
-| Dashboard | Menu Bar | Settings |
+| Dashboard | Mac Mini | Macbook Air |
 | :---: | :---: | :---: |
 | ![Dashboard](Media/tp01.png) | ![Menu](Media/tp02.png) | ![Settings](Media/tp03.png) |
 
