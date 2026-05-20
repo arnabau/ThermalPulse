@@ -12,8 +12,8 @@ class MockSMCService: SMCServiceProtocol {
     func getGPUTemperature() async throws -> Double { return 38.0 }
     func getFanNumber() async -> Int { return 2 }
     func getFanSpeed(for fanIndex: Int) async throws -> Int { return fanIndex == 0 ? 1250 : 1350 }
-    func setFanSpeed(for fanIndex: Int, rpm: Int) async throws { print("Mock: Ajustando fan \(fanIndex) a \(rpm) RPM") }
-    func setFanControlMode(isManual: Bool) async throws { print("Mock: Modo manual \(isManual)") }
+    func setFanSpeed(for fanIndex: Int, rpm: Int) async throws { print("Mock: Adjusting fan \(fanIndex) to \(rpm) RPM") }
+    func setFanControlMode(isManual: Bool) async throws { print("Mock: Manual mode \(isManual)") }
     func getFanMaxRPM(for fanIndex: Int) async throws -> Int {print(fanIndex); return 6000}
     func getFanMinRPM(for fanIndex: Int) async throws -> Int {print(fanIndex); return 1000}
     func getPowerUsage() async throws -> Double { return 5.2 }

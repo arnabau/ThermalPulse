@@ -73,7 +73,7 @@ class MenuBarController: NSObject, NSPopoverDelegate {
 
         guard let button = statusItem?.button else { return }
         
-        // If no metric is selected, use default icon
+        /// If no metric is selected, use default icon
         let showDefault = !showCPUUsage && !showGPUUsage && !showRAMUsage
         
         if showDefault {

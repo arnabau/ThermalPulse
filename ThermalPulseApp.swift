@@ -10,19 +10,7 @@ import AppKit
 
 @main
 struct ThermalPulseApp: App {
-    /// I'm only using AppDelegate to close the app. It returns the fans to automatic mode
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
-    /// Store the controller in a lifecycle property to prevent ARC from destroying it.
-//    @State private var menuBarController: MenuBarController?
-    
-    func isAppleSilicon() -> Bool {
-        #if arch(arm64)
-        return true
-        #else
-        return false
-        #endif
-    }
     
     init() {
         //SettingsManager.shared.resetUserDefaults()
@@ -36,22 +24,59 @@ struct ThermalPulseApp: App {
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    // ==============================================================
+    // Check minimum requirements. ThermalPulse only can run on Apple Silicon and macOS > 25
+    
+    let requiredVersion = OperatingSystemVersion(majorVersion: 25, minorVersion: 0, patchVersion: 0)
+    let currentVersion = ProcessInfo.processInfo.operatingSystemVersion
+    
+    func isAppleSilicon() -> Bool {
+        #if arch(arm64)
+        return true
+        #else
+        return false
+        #endif
+    }
+    func canUseApp() -> Bool {
+        let isSilicon = isAppleSilicon()
+        
+        if isSilicon || currentVersion.majorVersion >= requiredVersion.majorVersion {
+            return true
+        }
+
+        return false
+    }
+    
+
     var menuBarController: MenuBarController?
     let popover = NSPopover()
     
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // 1. Registrar valores por defecto en UserDefaults antes de que la UI los lea
+        if !canUseApp() {
+            let alert = NSAlert()
+            alert.messageText = "ThermalPulse requires macOS \(requiredVersion.majorVersion) or later on an Apple Silicon chip"
+            alert.alertStyle = .critical
+            alert.runModal()
+            
+            NSApp.terminate(nil)
+        }
+        
+        // If the minimum requirements are met...
+        
+        NSApp.setActivationPolicy(.accessory)
+        
+        /// 1. Register default values ​​in UserDefaults before the UI reads them
         UserDefaults.standard.register(defaults: [
             "showMenuBarCPUUsage": true,
             "showMenuBarGPUUsage": false,
             "showMenuBarRAMUsage": false
         ])
         
-        // 2. Configurar el Popover con tu DashboardView
+        /// 2. Configure the Popover with your DashboardView
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: DashboardView())
         
-        // 3. Inicializar el controlador y guardar la referencia fuerte en la propiedad de la clase
+        /// 3. Initialize the controller and save the strong reference in the class property
         menuBarController = MenuBarController(popover: popover)
     }
     
