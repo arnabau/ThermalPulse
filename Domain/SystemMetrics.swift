@@ -35,13 +35,9 @@ struct SystemMetrics {
     let gpuUsage: Double
     let gpuCores: Int
     // DISKS
-    let diskVolumes: [DiskInfo]
+    //let diskVolumes: [DiskInfo]
 }
 
-/// We get the whole disks array.
-/// To get main disk we can use:   metrics?.diskVolumes[0].totalCapacity.formatted(.byteCount(style: .file)) ?? "Unknown"
-/// Use the .file (decimal) option to formatt the output that macOS use ==> 1000 ($1 KB = 1000 bytes$)
-/// .memory (binary) it is used for RAM ==> 1024 ($1 KB = 1024 bytes$)
 struct DiskInfo: Identifiable {
     let id = UUID()
     let name: String

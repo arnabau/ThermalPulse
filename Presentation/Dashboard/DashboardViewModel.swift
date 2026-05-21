@@ -19,12 +19,9 @@ class DashboardViewModel: ObservableObject {
     @AppStorage("showMenuBarCPUUsage") var showMenuBarCPUUsage: Bool = true
     @AppStorage("showMenuBarGPUUsage") var showMenuBarGPUUsage: Bool = false
     @AppStorage("showMenuBarRAMUsage") var showMenuBarRAMUsage: Bool = false
-    //@AppStorage("showMenuBarCPUTemp") var showMenuBarCPUTemp: Bool = false
-    //@AppStorage("showMenuBarGPUTemp") var showMenuBarGPUTemp: Bool = false
     
     @Published var isManual: Bool = false
     @Published var selectedProfile: ThermalProfile = .system
-    @Published var userTargetSpeed: Double = 2000
     
     @Published var cpuTemp: Double = 0
     @Published var gpuTemp: Double = 0
@@ -58,19 +55,10 @@ class DashboardViewModel: ObservableObject {
         
         self.isManual = manager.isManualMode
         self.selectedProfile = manager.activeProfile
-        self.userTargetSpeed = Double(manager.manualTargetRPM)
+        //self.userTargetSpeed = userTargetSpeed
         
         loadSettings()
         setupSubscriptions()
-    }
-    
-    
-    func triggerSettingsUpdate() {
-        settingsChanged.send()
-        
-        /// fan control
-        guard isManual && isHelperInstalled else { return }
-        HardwareMonitorManager.shared.setFanSpeedSmoothly(targetRpm: Int(userTargetSpeed))
     }
     
     
@@ -90,8 +78,7 @@ class DashboardViewModel: ObservableObject {
         manager.$fanRPM.sink { [weak self] rpms in
             self?.fanRPM = rpms
             if let firstFan = rpms.first {
-                // COMPRBAR SI ES 6000 O ES EL MAXIMO QUE PERMITE EL FAN
-                self?.fanProgress = min(Double(firstFan) / 6000.0, 1.0)
+                self?.fanProgress = min(Double(firstFan) / (self?.manager.physicalMaxRPM ?? 0), 1.0)
             }
         }.store(in: &cancellables)
         manager.$fanCount.sink { [weak self] v in self?.fanNumber = v }.store(in: &cancellables)

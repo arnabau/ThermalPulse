@@ -49,8 +49,8 @@ class SystemMetricsProvider {
             macDescriptionName: getProductDescriptionARM() ?? "",
             gpuName: MTLCreateSystemDefaultDevice()?.name ?? "GPU",
             gpuUsage: getGPUUsage() / 100.0,
-            gpuCores: getGPUCoreCount(),
-            diskVolumes: await getDiskInfo()
+            gpuCores: getGPUCoreCount()
+            //diskVolumes: await getDiskInfo()
         )
     }
     
@@ -146,7 +146,7 @@ class SystemMetricsProvider {
     
     /// Get GPU info using Metal
     private func getGPUInfo() -> String {
-        /// We get the Metal device by default (the SoC in Apple Silicon)
+        /// Get the Metal device by default (the SoC in Apple Silicon)
         guard let device = MTLCreateSystemDefaultDevice() else {
             return "Unknown GPU"
         }

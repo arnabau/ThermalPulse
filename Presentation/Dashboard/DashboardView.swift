@@ -84,14 +84,6 @@ struct DashboardView: View {
         .padding(8)
         .frame(width: 320)
         .background(VisualEffectView(material: .hudWindow, blendingMode: .behindWindow).ignoresSafeArea())
-        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didResignKeyNotification)) { _ in
-            // Inactive window: Power saving mode (6-8 seconds)
-            HardwareMonitorManager.shared.startMonitoring(interval: 6)
-        }
-        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { _ in
-            // Active window: Real-time mode (2-3 seconds)
-            HardwareMonitorManager.shared.startMonitoring(interval: 3)
-        }
     }
     
     

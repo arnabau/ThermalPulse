@@ -13,6 +13,8 @@ import SwiftUI
 class HardwareMonitorManager: ObservableObject {
     static let shared = HardwareMonitorManager()
     
+    private var isUIVisible: Bool = false
+    
     #if DEBUG
     private let smcService: SMCServiceProtocol = MockSMCService()
     #else
@@ -31,21 +33,20 @@ class HardwareMonitorManager: ObservableObject {
     
     @Published var isManualMode: Bool = false
     @Published var activeProfile: ThermalProfile = .system
-    @Published var manualTargetRPM: Int = 2000
     
     /// cache
     private var lastAppliedSMCMode: Bool? = nil
     private var lastTargetRPM: Int? = nil
     private var rampingTask: Task<Void, Never>? /// Private property to control the active acceleration thread for fan speed. (smooth transition)
     
-    private(set) var physicalMinRPM: Double = 1000
-    private(set) var physicalMaxRPM: Double = 4900
+    private(set) var physicalMinRPM: Double = 1000 /// just a reference value. Calculations are made later for real-physical ram
+    private(set) var physicalMaxRPM: Double = 4900 /// just a reference value
     private var timer: AnyCancellable?
-    private let maxHistoryPoints = 30
     private let backgroundInterval: TimeInterval = 6.0
     private let foregroundInterval: TimeInterval = 3.0
     private var lastDiskUpdate: Date = .distantPast
     private let diskUpdateInterval: TimeInterval = 300 /// 5 min
+    private let maxHistoryPoints = 30
     private var isRefreshing = false
     
     private init() {
@@ -54,11 +55,13 @@ class HardwareMonitorManager: ObservableObject {
 
             if let minRpm = try? await smcService.getFanMinRPM(for: 0) { self.physicalMinRPM = Double(minRpm) }
             if let maxRpm = try? await smcService.getFanMaxRPM(for: 0) { self.physicalMaxRPM = Double(maxRpm) }
+            //print("Fan: \(fanCount), min: \(physicalMinRPM), max: \(physicalMaxRPM)")
         }
         startMonitoring(interval: backgroundInterval)
     }
     
     func setHighPriority(_ enabled: Bool) {
+        self.isUIVisible = enabled
         let newInterval = enabled ? foregroundInterval : backgroundInterval
         if enabled { Task { await refreshData() } }
         
@@ -75,48 +78,96 @@ class HardwareMonitorManager: ObservableObject {
             }
     }
     
+    func stopMonitoring() {
+        timer?.cancel()
+        timer = nil
+    }
+    
     private func refreshData() async {
         guard !isRefreshing else { return }
         isRefreshing = true
-        
         defer { isRefreshing = false }
         
         // ==========================================
         // PHASE 1: PASSIVE MONITORING (Always running)
         // ==========================================
         
+        let showCPU = UserDefaults.standard.bool(forKey: "showMenuBarCPUUsage")
+        let showGPU = UserDefaults.standard.bool(forKey: "showMenuBarGPUUsage")
+        let showRAM = UserDefaults.standard.bool(forKey: "showMenuBarRAMUsage")
+        
+        let isMenuBarActive = showCPU || showGPU || showRAM
+        let needsThermalControl = (activeProfile != .system)
+        
+        /// If the popover is closed, there is no text in the MenuBar and Apple handles the fans, suspend monitoring
+        if !isUIVisible && !isMenuBarActive && !needsThermalControl {
+            return
+        }
+        
         do {
             let cpu = try await smcService.getCPUTemperature()
             let gpu = try await smcService.getGPUTemperature()
-            let power = try await smcService.getPowerUsage()
             
+            //let power = try await smcService.getPowerUsage()
+            var power: Double = 0
             var currentSpeeds: [Int] = []
-            for i in 0..<fanCount {
-                let speed = try? await smcService.getFanSpeed(for: i)
-                currentSpeeds.append(speed ?? 0)
+            
+            /// Only query fan/watt info if the user opened the popover
+            if isUIVisible {
+                power = (try? await smcService.getPowerUsage()) ?? 0
+                for i in 0..<fanCount {
+                    let speed = try? await smcService.getFanSpeed(for: i)
+                    currentSpeeds.append(speed ?? 0)
+                }
             }
             
-            let newMetrics = await SystemMetricsProvider.fetchMetrics()
+//            for i in 0..<fanCount {
+//                let speed = try? await smcService.getFanSpeed(for: i)
+//                currentSpeeds.append(speed ?? 0)
+//            }
+            
+            /// Advanced system metrics (CPU tracker, RAM, battery) are only visible if someone is viewing them
+            //let newMetrics = await SystemMetricsProvider.fetchMetrics()
+            var newMetrics: SystemMetrics? = nil
+            if isUIVisible || isMenuBarActive {
+                newMetrics = await SystemMetricsProvider.fetchMetrics()
+            }
             
             var updatedDisks = self.diskMetrics
-            if Date().timeIntervalSince(lastDiskUpdate) > diskUpdateInterval {
+            if isUIVisible && Date().timeIntervalSince(lastDiskUpdate) > diskUpdateInterval {
                 updatedDisks = await SystemMetricsProvider.getDiskInfo()
                 lastDiskUpdate = Date()
             }
+//            if Date().timeIntervalSince(lastDiskUpdate) > diskUpdateInterval {
+//                updatedDisks = await SystemMetricsProvider.getDiskInfo()
+//                lastDiskUpdate = Date()
+//            }
             
             withAnimation(.smooth) {
                 self.cpuTemp = cpu
                 self.gpuTemp = gpu
-                self.fanRPM = currentSpeeds
-                self.powerUsage = power
-                self.metrics = newMetrics
-                self.diskMetrics = updatedDisks
+                if isUIVisible {
+                    self.fanRPM = currentSpeeds
+                    self.powerUsage = power
+                    self.diskMetrics = updatedDisks
+                }
+                if let metrics = newMetrics {
+                    self.metrics = metrics
+                }
+                //self.fanRPM = currentSpeeds
+                //self.powerUsage = power
+                //self.metrics = newMetrics
+                //self.diskMetrics = updatedDisks
             }
             
-            
-            let now = Date()
-            updateHistory(history: &self.cpuHistory, newValue: cpu, time: now)
-            updateHistory(history: &self.gpuHistory, newValue: gpu, time: now)
+            if isUIVisible {
+                let now = Date()
+                updateHistory(history: &self.cpuHistory, newValue: cpu, time: now)
+                updateHistory(history: &self.gpuHistory, newValue: gpu, time: now)
+            }
+//            let now = Date()
+//            updateHistory(history: &self.cpuHistory, newValue: cpu, time: now)
+//            updateHistory(history: &self.gpuHistory, newValue: gpu, time: now)
         } catch {
             print("Manager Error: \(error)")
         }
@@ -126,7 +177,7 @@ class HardwareMonitorManager: ObservableObject {
         // ==========================================
         
         /// no privileges? exit immediately. Zero resource consumption in control logic
-        guard DashboardViewModel.init().isHelperInstalled else { return }
+        guard HelperInstaller.isInstalled() else { return }
         
         /// Current profile requires app intervention? If profile is .system, we delegate thermal control entirely to Apple
         let targetSMCManualMode = (activeProfile != .system)
@@ -214,7 +265,7 @@ class HardwareMonitorManager: ObservableObject {
             guard var currentTarget = fanRPM.first else { return }
             
             let step = 100 /// How many RPMs does it increase/decrease in each iteration?
-            let intervalNanoseconds = UInt64(500_000_000) // 50 milisegundos entre pasos
+            let intervalNanoseconds = UInt64(500_000_000) /// 500 miliseconds
             
             while !Task.isCancelled {
                 let difference = targetRpm - currentTarget

@@ -26,7 +26,7 @@ class MenuBarController: NSObject, NSPopoverDelegate {
         setupSubscriptions()
     }
     
-    /// icons at menubar
+    /// menubar icons
     private func setupItems() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem?.button {
@@ -35,8 +35,8 @@ class MenuBarController: NSObject, NSPopoverDelegate {
             button.target = self
             button.imagePosition = .imageLeading
         }
-    }    
-
+    }
+    
     
     private func setupSubscriptions() {
         let monitor = HardwareMonitorManager.shared

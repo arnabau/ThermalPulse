@@ -43,7 +43,7 @@ final class SettingsManager {
         }
     }
     
-    /// Reset setting data
+    /// Reset setting data. Could be usefull for testing
     func resetUserDefaults() {
         guard let bundleID = Bundle.main.bundleIdentifier else { return } /// Get the Bundle Identifier of the current app
         UserDefaults.standard.removePersistentDomain(forName: bundleID) /// removed the entire domain
