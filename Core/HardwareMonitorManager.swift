@@ -265,7 +265,7 @@ class HardwareMonitorManager: ObservableObject {
             guard var currentTarget = fanRPM.first else { return }
             
             let step = 100 /// How many RPMs does it increase/decrease in each iteration?
-            let intervalNanoseconds = UInt64(500_000_000) /// 500 miliseconds
+            let intervalNanoseconds = UInt64(600_000_000) /// 600 miliseconds
             
             while !Task.isCancelled {
                 let difference = targetRpm - currentTarget

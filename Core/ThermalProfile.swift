@@ -19,8 +19,8 @@ enum ThermalProfile: String, CaseIterable, Identifiable {
     var tempMin: Double {
         switch self {
         case .system: return 0.0
-        case .balanced: return 60.0
-        case .aggressive: return 40.0
+        case .balanced: return 75.0
+        case .aggressive: return 45.0
         }
     }
     
@@ -28,7 +28,7 @@ enum ThermalProfile: String, CaseIterable, Identifiable {
     var tempMax: Double {
         switch self {
         case .system: return 0.0
-        case .balanced: return 90.0
+        case .balanced: return 95.0
         case .aggressive: return 75.0
         }
     }
