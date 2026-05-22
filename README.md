@@ -71,7 +71,7 @@ The UI leverages **Glassmorphism** and **Material effects** to blend perfectly w
 
 ## ToDo:
 - Error Handling: More robust error messaging for failed installations
-- Performance: Additional throttling for high-frequency updates
+- ~~Performance: Additional throttling for high-frequency updates~~
 - Localization: Internationalization support
 
 ## 🛠 Installation
