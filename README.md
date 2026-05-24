@@ -4,7 +4,7 @@ ThermalPulse is a fully-functional, modern, lightweight, SwiftUI macOS applicati
 
 New update: The code was cleaned up and significant optimizations in resource consumption were achieved.
 
-Download latest version: 1.0.18 https://github.com/arnabau/thermalpulse/releases/latest
+Download latest version: 1.1 https://github.com/arnabau/thermalpulse/releases/latest
 
 ## 🚀 Key Features
 
