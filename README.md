@@ -79,3 +79,14 @@ The UI leverages **Glassmorphism** and **Material effects** to blend perfectly w
 2. Clone the repository:
    ```bash
    git clone [https://github.com/arnabau/ThermalPulse.git](https://github.com/arnabau/ThermalPulse.git)
+
+### Tip:
+To modify the fan speeds on your Mac, ThermalPulse needs to install a helper tool to communicate directly with the Apple hardware and access the System Management Controller (SMC). The application's Dashboard provides the option to install and uninstall the helper tool as needed.
+
+Most of the time you'll only use "System" mode. Apple knows how to balance its own temperatures quite well, although they prefer a quiet environment even if it means more heat.
+
+ThermalPulse "Balanced" and "Aggressive" modes work with a simple but effective algorithm. They try to maintain a balance between heat and noise. If you really need to get the most out of your Mac and prefer a cooler environment, try using these manual modes. 
+
+Thank you for using ThermalPulse. I developed it with a lot of love and effort.
+
+Your suggestions or bug reports are welcome. You're also welcome to collaborate on the project.
