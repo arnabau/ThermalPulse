@@ -108,7 +108,6 @@ class HardwareMonitorManager: ObservableObject {
             let cpu = try await smcService.getCPUTemperature()
             let gpu = try await smcService.getGPUTemperature()
             
-            //let power = try await smcService.getPowerUsage()
             var power: Double = 0
             var currentSpeeds: [Int] = []
             
@@ -121,13 +120,7 @@ class HardwareMonitorManager: ObservableObject {
                 }
             }
             
-//            for i in 0..<fanCount {
-//                let speed = try? await smcService.getFanSpeed(for: i)
-//                currentSpeeds.append(speed ?? 0)
-//            }
-            
             /// Advanced system metrics (CPU tracker, RAM, battery) are only visible if someone is viewing them
-            //let newMetrics = await SystemMetricsProvider.fetchMetrics()
             var newMetrics: SystemMetrics? = nil
             if isUIVisible || isMenuBarActive {
                 newMetrics = await SystemMetricsProvider.fetchMetrics()
@@ -138,10 +131,6 @@ class HardwareMonitorManager: ObservableObject {
                 updatedDisks = await SystemMetricsProvider.getDiskInfo()
                 lastDiskUpdate = Date()
             }
-//            if Date().timeIntervalSince(lastDiskUpdate) > diskUpdateInterval {
-//                updatedDisks = await SystemMetricsProvider.getDiskInfo()
-//                lastDiskUpdate = Date()
-//            }
             
             withAnimation(.smooth) {
                 self.cpuTemp = cpu
@@ -154,10 +143,6 @@ class HardwareMonitorManager: ObservableObject {
                 if let metrics = newMetrics {
                     self.metrics = metrics
                 }
-                //self.fanRPM = currentSpeeds
-                //self.powerUsage = power
-                //self.metrics = newMetrics
-                //self.diskMetrics = updatedDisks
             }
             
             if isUIVisible {
@@ -165,9 +150,6 @@ class HardwareMonitorManager: ObservableObject {
                 updateHistory(history: &self.cpuHistory, newValue: cpu, time: now)
                 updateHistory(history: &self.gpuHistory, newValue: gpu, time: now)
             }
-//            let now = Date()
-//            updateHistory(history: &self.cpuHistory, newValue: cpu, time: now)
-//            updateHistory(history: &self.gpuHistory, newValue: gpu, time: now)
         } catch {
             print("Manager Error: \(error)")
         }

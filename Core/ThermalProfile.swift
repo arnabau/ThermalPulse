@@ -20,7 +20,7 @@ enum ThermalProfile: String, CaseIterable, Identifiable {
         switch self {
         case .system: return 0.0
         case .balanced: return 75.0
-        case .aggressive: return 45.0
+        case .aggressive: return 60.0
         }
     }
     
@@ -29,22 +29,20 @@ enum ThermalProfile: String, CaseIterable, Identifiable {
         switch self {
         case .system: return 0.0
         case .balanced: return 95.0
-        case .aggressive: return 75.0
+        case .aggressive: return 80.0
         }
     }
     
     /// Define what percentage of the fan's physical range each profile uses.
+    /// Final value = Minimum + (Range x Percentage)
     func rpmBounds(minPhysical: Double, maxPhysical: Double) -> (min: Double, max: Double) {
         let range = maxPhysical - minPhysical
         switch self {
         case .system:
             return (minPhysical, maxPhysical)
         case .balanced:
-            /// Silent: Maintains minimum noise level for longer, maximum limited to 50% of capacity
-            return (minPhysical, minPhysical + (range * 0.50))
-//        case .airwaves:
-//            // Airwaves: A small increase at the base, up to 80% capacity
-//            return (minPhysical + (range * 0.10), minPhysical + (range * 0.80))
+            /// Silent: Maintains minimum noise level for longer, maximum limited to 65% of capacity
+            return (minPhysical, minPhysical + (range * 0.65))
         case .aggressive:
             /// High performance: Elevated base for preventative cooling, use 100% if needed
             return (minPhysical + (range * 0.25), maxPhysical)
@@ -77,9 +75,9 @@ extension ThermalProfile {
         case .system:
             return "Automatic control. (Apple native)"
         case .balanced:
-            return "Optimizes thermal flow. Quiet environment"
+            return "Optimizes thermal flow. Quiet but not to hot"
         case .aggressive:
-            return "Proactive dissipation"
+            return "Proactive dissipation. Use 100% if needed"
         }
     }
 }

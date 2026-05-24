@@ -12,8 +12,25 @@ final class SMCService: SMCServiceProtocol {
     private let smc = SMCKit.shared
     
     /// Apple silicon keys
-    private let cpuKeys = ["Tp09", "Tp0T", "Tp01", "Tp05", "Tp0D", "Tp0b"]
-    private let gpuKeys = ["Tg05", "Tg0f", "Tg0L", "Tg0J", "TGDD", "TG0P", "TG0D", "TG0E", "TG0F"]
+    ///
+    /// Tp0D (CPU Die/Package): This is one of the key indicators. It measures the overall temperature of the CPU die or main package. "Average" to show in UI
+    /// Tp01 and Tp05 (CPU E-Core Cluster / P-Core Cluster): These keys monitor specific core clusters. Tp01 (usually) measures the average efficiency core (E-core) block.
+    ///     The other (such as Tp05) measures the performance core (P-core) block.
+    /// Tp09 and Tp0b (CPU Core Digital Sensors / Auxiliaries): These are digital thermal diodes distributed in strategic areas of the CPU
+    /// Tp0T (CPU Thermal Proximity / Top): Measures temperature by thermal proximity
+    /// Priority: P-Cores > E-Cores > Die (Average)
+    private let cpuKeys = ["Tp05", "Tp01", "Tp0D", "Tp0T", "Tp09", "Tp0b"]
+    
+    /// TG0D (GPU 0 Die): Measures the temperature of the GPU's main silicon block (Die). It is one of the most important and reliable keys
+    /// TGDD (GPU Die Domain): It is the graphics digital domain sensor
+    /// TG0P (GPU 0 Proximity): Proximity temperature
+    /// TG0E and TG0F (GPU 0 Diode E / Diode F): These are secondary thermal diodes placed in the power supply phases or in the power lines dedicated to the GPU
+    /// Tg0J (GPU Junction): Measures the junction temperature
+    /// Tg05 and Tg0f (GPU Cluster Sensors): Map specific execution clusters within the GPU
+    /// Tg0L (GPU Local / Limit): Monitors the local thermal limits of the GPU's texture units or shaders
+    ///
+    /// Priority: Junction (Hottest point) > Clusters > Die
+    private let gpuKeys = ["Tg0J", "Tg05", "Tg0f", "TG0D", "TGDD", "Tg0L", "TG0P", "TG0E", "TG0F"]
     
     private var activeCpuKey: FourCharCode?
     private var activeGpuKey: FourCharCode?
@@ -32,6 +49,7 @@ final class SMCService: SMCServiceProtocol {
             lastValidCpuTemp = temp
             return temp
         }
+        
         return lastValidCpuTemp
     }
     
@@ -45,6 +63,7 @@ final class SMCService: SMCServiceProtocol {
             lastValidGpuTemp = temp
             return temp
         }
+        
         return lastValidGpuTemp
     }
     

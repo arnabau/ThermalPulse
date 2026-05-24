@@ -98,7 +98,7 @@ struct DashboardView: View {
                 .background(Color.tpAccentTeal.opacity(0.05))
                 .clipShape(Circle())
             VStack(alignment: .leading) {
-                Text("ThermalPulse")
+                Text("ThermalPulse v\(Bundle.main.releaseVersionNumber ?? "1.0")")
                     .font(.headline)
             }
             
@@ -491,4 +491,14 @@ struct VisualEffectView: NSViewRepresentable {
     }
     
     func updateNSView(_ nsView: NSVisualEffectView, context: Context) { }
+}
+
+// Get app version
+extension Bundle {
+    var releaseVersionNumber: String? {
+        return infoDictionary?["CFBundleShortVersionString"] as? String
+    }
+    var buildVersionNumber: String? {
+        return infoDictionary?["CFBundleVersion"] as? String
+    }
 }

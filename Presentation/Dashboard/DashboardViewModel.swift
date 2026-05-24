@@ -55,7 +55,6 @@ class DashboardViewModel: ObservableObject {
         
         self.isManual = manager.isManualMode
         self.selectedProfile = manager.activeProfile
-        //self.userTargetSpeed = userTargetSpeed
         
         loadSettings()
         setupSubscriptions()
