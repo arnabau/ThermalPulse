@@ -90,3 +90,9 @@ ThermalPulse "Balanced" and "Aggressive" modes work with a simple but effective 
 Thank you for using ThermalPulse. I developed it with a lot of love and effort.
 
 Your suggestions or bug reports are welcome. You're also welcome to collaborate on the project.
+
+## ¿Do you like ThermalPulse?
+
+If you found it helpful, consider buying me a coffee ☕ to motivate me to keep it up:
+
+[<image-card alt="Buy Me a Coffee" src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" ></image-card>](https://buymeacoffee.com/stringsandbits)
