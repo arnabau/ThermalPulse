@@ -44,8 +44,9 @@ enum ThermalProfile: String, CaseIterable, Identifiable {
             /// Silent: Maintains minimum noise level for longer, maximum limited to 65% of capacity
             return (minPhysical, minPhysical + (range * 0.65))
         case .aggressive:
-            /// High performance: Elevated base for preventative cooling, use 100% if needed
-            return (minPhysical + (range * 0.25), maxPhysical)
+            /// High performance: Elevated base for preventative cooling. minPhysical + 20% is gonna be "the floor" always
+            return (minPhysical + (range * 0.20), minPhysical + (range * 0.90)) /// set min to 20% max to 90%
+            //return (minPhysical + (range * 0.25), maxPhysical) /// use 100% if needed
         }
     }
 }

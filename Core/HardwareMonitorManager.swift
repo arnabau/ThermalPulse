@@ -190,10 +190,16 @@ class HardwareMonitorManager: ObservableObject {
             let calculatedRpm = calculateAutoRPM(for: maxCurrentTemp)
             
             /// Only trigger the ramp if the RPM target changes significantly. Avoid restarting asynchronous tasks if the thermal target remains the same
-            if lastTargetRPM != calculatedRpm {
+            /// Ignore changes below 150 RPM to avoid fan "stuttering" caused by normal temperature fluctuations in the P-Cores
+            let currentTarget = lastTargetRPM ?? 0
+            if abs(currentTarget - calculatedRpm) > 150 {
                 lastTargetRPM = calculatedRpm
                 setFanSpeedSmoothly(targetRpm: calculatedRpm)
             }
+//            if lastTargetRPM != calculatedRpm {
+//                lastTargetRPM = calculatedRpm
+//                setFanSpeedSmoothly(targetRpm: calculatedRpm)
+//            }
         }
     }
     
@@ -247,7 +253,7 @@ class HardwareMonitorManager: ObservableObject {
             guard var currentTarget = fanRPM.first else { return }
             
             let step = 100 /// How many RPMs does it increase/decrease in each iteration?
-            let intervalNanoseconds = UInt64(600_000_000) /// 600 miliseconds
+            let intervalNanoseconds = UInt64(150_000_000) /// 150 miliseconds
             
             while !Task.isCancelled {
                 let difference = targetRpm - currentTarget
