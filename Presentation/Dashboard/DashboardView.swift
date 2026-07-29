@@ -297,7 +297,7 @@ struct FanSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Fan Management")
+                Text(viewModel.fanNumber == 1 ? "Fan" : "Fans")
                     .font(.system(size: 12, weight: .bold))
                     .foregroundColor(.secondary)
                 Spacer()
@@ -345,13 +345,13 @@ struct FanSection: View {
         VStack {
             Divider().opacity(0.2)
             
-            VStack(spacing: 10) {
-                HStack(spacing: 12) {
+            VStack(spacing: 6) {
+                HStack(spacing: 6) {
                     ForEach(ThermalProfile.allCases) { profile in
                         let isSelected = viewModel.selectedProfile == profile
                         let isAllowed = profile == .system || viewModel.isHelperInstalled
                         Button(action: { viewModel.setProfile(profile) }) {
-                            VStack(spacing: 6) {
+                            VStack(spacing: 5) {
                                 Image(systemName: profileIcon(for: profile))
                                     .font(.title3)
                                 Text(profile.rawValue)
@@ -365,7 +365,7 @@ struct FanSection: View {
                             .cornerRadius(8)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(isSelected ? profileColor(for: profile) : Color.clear, lineWidth: 1.5)
+                                    .stroke(isSelected ? profileColor(for: profile) : Color.clear, lineWidth: 1.2)
                             )
                         }
                         .disabled(!isAllowed || isSelected)
@@ -374,7 +374,7 @@ struct FanSection: View {
                         .help(isAllowed ? "Activate profile \(profile.rawValue)" : "Requiere Privileged Helper Tool")
                     }
                 }
-                .padding(.horizontal)
+                .padding(.horizontal, 2)
                 
                 Divider().opacity(0.2)
                 
@@ -466,6 +466,7 @@ func profileIcon(for profile: ThermalProfile) -> String {
     switch profile {
     case .system: return "leaf.fill"
     case .balanced: return "wind"
+    case .cool: return "snowflake"
     case .aggressive: return "flame.fill"
     }
 }
@@ -474,6 +475,7 @@ func profileColor(for profile: ThermalProfile) -> Color {
     switch profile {
     case .system: return .green
     case .balanced: return .blue
+    case .cool: return .teal
     case .aggressive: return .orange
     }
 }

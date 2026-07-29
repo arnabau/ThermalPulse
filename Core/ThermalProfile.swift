@@ -11,6 +11,7 @@ import SwiftUI
 enum ThermalProfile: String, CaseIterable, Identifiable {
     case system = "System"
     case balanced = "Balanced"
+    case cool = "Cool"
     case aggressive = "Aggressive"
     
     var id: String { self.rawValue }
@@ -20,7 +21,8 @@ enum ThermalProfile: String, CaseIterable, Identifiable {
         switch self {
         case .system: return 0.0
         case .balanced: return 75.0
-        case .aggressive: return 60.0
+        case .cool: return 60.0
+        case .aggressive: return 50.0
         }
     }
     
@@ -28,7 +30,8 @@ enum ThermalProfile: String, CaseIterable, Identifiable {
     var tempMax: Double {
         switch self {
         case .system: return 0.0
-        case .balanced: return 95.0
+        case .balanced: return 99.0
+        case .cool: return 90.0
         case .aggressive: return 80.0
         }
     }
@@ -41,8 +44,11 @@ enum ThermalProfile: String, CaseIterable, Identifiable {
         case .system:
             return (minPhysical, maxPhysical)
         case .balanced:
-            /// Silent: Maintains minimum noise level for longer, maximum limited to 65% of capacity
-            return (minPhysical, minPhysical + (range * 0.65))
+            /// Silent: Maintains minimum noise level for longer, maximum limited to 50% of capacity
+            return (minPhysical, minPhysical + (range * 0.50))
+            //return (minPhysical + (range * 0.05), minPhysical + (range * 0.50))
+        case .cool:
+            return (minPhysical + (range * 0.10), minPhysical + (range * 0.75)) /// set min to 10% max to 75%
         case .aggressive:
             /// High performance: Elevated base for preventative cooling. minPhysical + 20% is gonna be "the floor" always
             return (minPhysical + (range * 0.20), minPhysical + (range * 0.90)) /// set min to 20% max to 90%
@@ -58,6 +64,8 @@ extension ThermalProfile {
             return .tpAccentGreen
         case .balanced:
             return .tpAccentBlue
+            case .cool:
+            return .tpAccentTeal.opacity(0.7)
         case .aggressive:
             return .tpAccentOrange
         }
@@ -67,6 +75,7 @@ extension ThermalProfile {
         switch self {
         case .system: return "leaf.fill"
         case .balanced: return "wind"
+        case .cool: return "snowflake"
         case .aggressive: return "flame.fill"
         }
     }
@@ -77,6 +86,8 @@ extension ThermalProfile {
             return "Automatic control. (Apple native)"
         case .balanced:
             return "Optimizes thermal flow. Quiet but not to hot"
+        case .cool:
+            return "Keeps you cool in hot conditions"
         case .aggressive:
             return "Proactive dissipation. Use 100% if needed"
         }
